@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Drawing.cs" />
+    <Compile Include="Points.cs" />
     <Compile Include="Points_generator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

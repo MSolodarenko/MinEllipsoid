@@ -12,9 +12,11 @@ namespace MinEllipsoid_with_visualisation
         [STAThread]
         public static void Main()
         {
-            Points_generator gen = new Points_generator(10);
-            gen.runGenerator();
-           /* using (var game = new GameWindow())
+            Points p = new Points();
+            p.ReadFromFile();
+            //Points_generator gen = new Points_generator(10);
+            //gen.runGenerator();
+            /*using (var game = new GameWindow())
             {
                 game.Load += (sender, e) =>
                 {
@@ -61,7 +63,8 @@ namespace MinEllipsoid_with_visualisation
 
                 // Run the game at 60 updates per second
                 game.Run(60.0);
-            }*/
+            }
+             */
         }
     }
 }
