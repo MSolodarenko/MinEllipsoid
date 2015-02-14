@@ -31,7 +31,7 @@ namespace MinEllipsoid_with_visualisation
                 points[i] = new Vector3d(Convert.ToDouble(unline[0]), Convert.ToDouble(unline[1]), Convert.ToDouble(unline[2]));
             }
 
-            //Console.ReadKey();
+            sr.Close();
         }
     }
 }
