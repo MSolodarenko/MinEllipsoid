@@ -5,14 +5,16 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
-namespace Example
+namespace MinEllipsoid_with_visualisation
 {
     class MyApplication
     {
         [STAThread]
         public static void Main()
         {
-            using (var game = new GameWindow())
+            Points_generator gen = new Points_generator(10);
+            gen.runGenerator();
+           /* using (var game = new GameWindow())
             {
                 game.Load += (sender, e) =>
                 {
@@ -59,7 +61,7 @@ namespace Example
 
                 // Run the game at 60 updates per second
                 game.Run(60.0);
-            }
+            }*/
         }
     }
 }
