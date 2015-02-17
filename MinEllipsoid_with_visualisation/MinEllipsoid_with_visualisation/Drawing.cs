@@ -4,6 +4,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace MinEllipsoid_with_visualisation
 {
@@ -16,6 +18,9 @@ namespace MinEllipsoid_with_visualisation
             //gen.runGenerator();
             Points p = new Points();
             p.ReadFromFile();
+            Console.WriteLine("I start creating convex_hull");
+            Convex_hull p_list = new Convex_hull(p);
+            List<Vector3d> point_list = p_list.Create_convex_hull();
             
             using (var game = new GameWindow(700,700))
             {
@@ -50,6 +55,20 @@ namespace MinEllipsoid_with_visualisation
 
                     Decarts_Lines();
                     DrawPoints(p);
+
+                    GL.Begin(PrimitiveType.Triangles);
+                    for (int i = 0; i < point_list.Count; ++i )
+                    {
+                        if (point_list[i].Z < -0.5)
+                            GL.Color3(Color.Black);
+                        else if (point_list[i].Z > -0.5 && point_list[i].Z < 0)
+                            GL.Color3(Color.Maroon);
+                        else if (point_list[i].Z > 0 && point_list[i].Z < 0.5)
+                            GL.Color3(Color.Crimson);
+                        else GL.Color3(Color.Red);
+                        GL.Vertex3(point_list[i]);
+                    }
+                    GL.End();
 
                     game.SwapBuffers();
                 };
