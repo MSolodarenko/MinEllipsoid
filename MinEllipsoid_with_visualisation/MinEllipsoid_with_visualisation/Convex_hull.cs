@@ -54,13 +54,24 @@ namespace MinEllipsoid_with_visualisation
             for (int i = 0; i<6; ++i)
             {
                 if (i != a && i != b)
-                    if (maxDistance < Point_line_distance(p.points[i],p.points[a],p.points[b]))
+                    if (maxDistance < Point_line_distance(p.points[ep[i]],p.points[a],p.points[b]))
                     {
-                        maxDistance = Point_line_distance(p.points[i], p.points[a], p.points[b]);
+                        maxDistance = Point_line_distance(p.points[ep[i]], p.points[a], p.points[b]);
                         c = ep[i];
                     }
             }
 
+            maxDistance = 0;
+            int d = 0;
+            for (int i = 0; i < 6; ++i)
+            {
+                if (i != a && i != b && i != c)
+                    if (maxDistance < Point_plain_distance(p.points[ep[i]], p.points[a], p.points[b], p.points[c]))
+                    {
+                        maxDistance = Point_plain_distance(p.points[ep[i]], p.points[a], p.points[b], p.points[c]);
+                        d = ep[i];
+                    }
+            }
 
         }
         public double Points_distance(Vector3d a, Vector3d b)
