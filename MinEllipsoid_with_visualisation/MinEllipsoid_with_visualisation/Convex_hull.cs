@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using System.Collections;
 
 namespace MinEllipsoid_with_visualisation
 {
@@ -16,6 +17,8 @@ namespace MinEllipsoid_with_visualisation
         }
         public void Create_convex_hull()
         {
+            List<Vector3d> convex_hull = new List<Vector3d>();    //Each 3 points form plain
+
             int[] ep = new int[6];                      //Extreme points: 0 - minX, 1 - minY, 2 - minZ, 3 - maxX, 4 - maxY, 5 - maxZ
             for (int i = 0; i < 6; ++i)
                 ep[i] = 0;
@@ -73,6 +76,16 @@ namespace MinEllipsoid_with_visualisation
                     }
             }
 
+            convex_hull.Add(p.points[a]); convex_hull.Add(p.points[b]); convex_hull.Add(p.points[c]);
+            convex_hull.Add(p.points[b]); convex_hull.Add(p.points[c]); convex_hull.Add(p.points[d]);
+            convex_hull.Add(p.points[c]); convex_hull.Add(p.points[d]); convex_hull.Add(p.points[a]);
+            convex_hull.Add(p.points[d]); convex_hull.Add(p.points[a]); convex_hull.Add(p.points[b]);
+
+            bool[] status = new bool[p.num_of_points];        //status of points: true - inside hull, false - outside
+            for (int i = 0; i < p.num_of_points; ++i)
+                status[i] = point_inside_hull(p.points[i], convex_hull);
+
+
         }
         public double Points_distance(Vector3d a, Vector3d b)
         {
@@ -110,6 +123,32 @@ namespace MinEllipsoid_with_visualisation
             if (plain_mod != 0)
                 return plain_point_mod / plain_mod;
             return 0;
+        }
+        public bool point_inside_hull(Vector3d Point, List<Vector3d> convex_hull)
+        {
+            double ox = 0, oy = 0, oz = 0;
+            int i = 0;
+            for (; i < convex_hull.Count; ++i )
+            {
+                ox += convex_hull[i].X;
+                oy += convex_hull[i].Y;
+                oz += convex_hull[i].Z;
+            }
+            ox = ox / (double)i; oy = oy / (double)i; oz = oz / (double)i;
+
+            for (i = 2; i < convex_hull.Count; i=i+3 )
+            {
+                double A = (convex_hull[i-1].Y - convex_hull[i-2].Y) * (convex_hull[i].Z - convex_hull[i-2].Z) - (convex_hull[i].Y - convex_hull[i-2].Y) * (convex_hull[i-1].Z - convex_hull[i-2].Z);
+                double B = (convex_hull[i-1].Z - convex_hull[i-2].Z) * (convex_hull[i].X - convex_hull[i-2].X) - (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Z - convex_hull[i-2].Z);
+                double C = (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Y - convex_hull[i-2].Y) - (convex_hull[i].X - convex_hull[i-2].X) * (convex_hull[i-1].Y - convex_hull[i-2].Y);
+                double D = convex_hull[i-2].X * ((convex_hull[i].Y - convex_hull[i-2].Y) * (convex_hull[i-1].Z - convex_hull[i-2].Z) - (convex_hull[i-1].Y - convex_hull[i-2].Y) * (convex_hull[i].Z - convex_hull[i-2].Z)) + convex_hull[i-2].Y * ((convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Z - convex_hull[i-2].Z) - (convex_hull[i-1].Z - convex_hull[i-2].Z) * (convex_hull[i].X - convex_hull[i-2].X)) + convex_hull[i-2].Z * ((convex_hull[i].X - convex_hull[i-2].X) * (convex_hull[i-1].Y - convex_hull[i-2].Y) - (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Y - convex_hull[i-2].Y));
+
+                if (A * ox + B * oy + C * oz + D > 0 && A * Point.X + B * Point.Y + C * Point.Z + D < 0)
+                    return false;
+                if (A * ox + B * oy + C * oz + D < 0 && A * Point.X + B * Point.Y + C * Point.Z + D > 0)
+                    return false;
+            }
+                return true;
         }
     }
 }
