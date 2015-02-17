@@ -49,6 +49,17 @@ namespace MinEllipsoid_with_visualisation
                     }
                 }
 
+            maxDistance = 0;
+            int c = 0;
+            for (int i = 0; i<6; ++i)
+            {
+                if (i != a && i != b)
+                    if (maxDistance < Point_line_distance(p.points[i],p.points[a],p.points[b]))
+                    {
+                        maxDistance = Point_line_distance(p.points[i], p.points[a], p.points[b]);
+                        c = ep[i];
+                    }
+            }
 
 
         }
@@ -60,6 +71,7 @@ namespace MinEllipsoid_with_visualisation
         }
         public double Point_line_distance(Vector3d Point, Vector3d M2, Vector3d M3)
         {
+            if (Point == M2 || Point == M3) return 0;
             double ax, ay, az;
             ax = M3.X - M2.X;
             ay = M3.Y - M2.Y;
@@ -72,6 +84,20 @@ namespace MinEllipsoid_with_visualisation
             double a_PointM3_mod = Math.Sqrt(i * i + j * j + k * k);
             if (a_mod != 0)
                 return (a_PointM3_mod/a_mod);
+            return 0;
+        }
+        public double Point_plain_distance(Vector3d Point, Vector3d M0, Vector3d M1, Vector3d M2)
+        {
+            double A = (M1.Y - M0.Y) * (M2.Z - M0.Z) - (M2.Y - M0.Y) * (M1.Z - M0.Z);
+            double B = (M1.Z - M0.Z) * (M2.X - M0.X) - (M1.X - M0.X) * (M2.Z - M0.Z);
+            double C = (M1.X - M0.X) * (M2.Y - M0.Y) - (M2.X - M0.X) * (M1.Y - M0.Y);
+            double D = M0.X * ((M2.Y - M0.Y) * (M1.Z - M0.Z) - (M1.Y - M0.Y) * (M2.Z - M0.Z)) + M0.Y * ((M1.X - M0.X) * (M2.Z - M0.Z) - (M1.Z - M0.Z) * (M2.X - M0.X)) + M0.Z * ((M2.X - M0.X) * (M1.Y - M0.Y) - (M1.X - M0.X) * (M2.Y - M0.Y));
+
+            double plain_mod = Math.Sqrt(A * A + B * B + C * C);
+            double plain_point_mod = Math.Abs(A * Point.X + B * Point.Y + C * Point.Z + D);
+
+            if (plain_mod != 0)
+                return plain_point_mod / plain_mod;
             return 0;
         }
     }
