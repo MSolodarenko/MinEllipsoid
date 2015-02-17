@@ -35,6 +35,7 @@ namespace MinEllipsoid_with_visualisation
                 if (p.points[i].Z > p.points[ep[5]].Z)
                     ep[5] = i;
             }
+
             double maxDistance = 0;
             int a = 0, b = 0;                       // The most distant points of EPs
             for (int i = 0; i < 6; ++i)
@@ -48,6 +49,8 @@ namespace MinEllipsoid_with_visualisation
                     }
                 }
 
+
+
         }
         public double Points_distance(Vector3d a, Vector3d b)
         {
@@ -55,8 +58,20 @@ namespace MinEllipsoid_with_visualisation
             result = Math.Sqrt(Math.Pow((b.X - a.X), 2) + Math.Pow((b.Y - a.Y), 2) + Math.Pow((b.Z - a.Z), 2));
             return result;
         }
-        public double Point_line_distance(Vector3d x, Vector3d a, Vector3d b)
+        public double Point_line_distance(Vector3d Point, Vector3d M2, Vector3d M3)
         {
+            double ax, ay, az;
+            ax = M3.X - M2.X;
+            ay = M3.Y - M2.Y;
+            az = M3.Z - M2.Z;
+
+            double a_mod = Math.Sqrt(ax * ax + ay * ay + az * az);
+            double i = ay * (Point.Z - M3.Z) - az * (Point.Y - M3.Y);     //
+            double j = az * (Point.X - M3.X) - ax * (Point.Z - M3.Z);     // Coefficients of multiplying of pointing vector and vector between Point and M3
+            double k = ax * (Point.Y - M3.Y) - ay * (Point.X - M3.X);     //
+            double a_PointM3_mod = Math.Sqrt(i * i + j * j + k * k);
+            if (a_mod != 0)
+                return (a_PointM3_mod/a_mod);
             return 0;
         }
     }

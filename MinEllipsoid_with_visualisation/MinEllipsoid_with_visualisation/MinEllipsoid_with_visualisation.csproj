@@ -46,7 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Convex_hull.cs" />
     <Compile Include="Drawing.cs" />
+    <Compile Include="Line.cs" />
     <Compile Include="Points.cs" />
     <Compile Include="Points_generator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
