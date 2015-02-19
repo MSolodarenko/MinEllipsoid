@@ -13,6 +13,7 @@ namespace MinEllipsoid_with_visualisation
         Points p;
         int[] ep;       //Extreme points: 0 - minX, 1 - minY, 2 - minZ, 3 - maxX, 4 - maxY, 5 - maxZ
         int a, b, c, d; //First 4 points in convex_hull
+        int max;
         public Convex_hull(Points temp)
         {
             p = temp;
@@ -43,7 +44,6 @@ namespace MinEllipsoid_with_visualisation
             for (int i = 0; i < convex_hull.Count - 2; i = i + 3 )
             {
                 maxDistance = 0;
-                a = 0;
                 for (int k=0; k < p.num_of_points; ++k)
                 {
                     if (outside_hull[k])
@@ -53,26 +53,23 @@ namespace MinEllipsoid_with_visualisation
                             if (maxDistance < Point_plain_distance(p.points[k], convex_hull[i], convex_hull[i + 1], convex_hull[i + 2]))
                             {
                                 maxDistance = Point_plain_distance(p.points[k], convex_hull[i], convex_hull[i + 1], convex_hull[i + 2]);
-                                a = k;
+                                max = k;
                             }
                         }
                     }
                 }
                 for (int j = 0; j < convex_hull.Count - 2; j = j + 3 )
                 {
-                    if (point_on_plain(p.points[a], convex_hull, convex_hull[j], convex_hull[j+1], convex_hull[j+2]))
+                    if (point_on_plain(p.points[max], convex_hull, convex_hull[j], convex_hull[j+1], convex_hull[j+2]))
                     {
-                        add_plain_to(convex_hull, p.points[a], convex_hull[j], convex_hull[j + 1]);
-                        //convex_hull.Add(p.points[a]); convex_hull.Add(convex_hull[j]); convex_hull.Add(convex_hull[j + 1]);
-                        add_plain_to(convex_hull, convex_hull[j + 2], convex_hull[j + 1], p.points[a]);
-                        //convex_hull.Add(convex_hull[j + 2]); convex_hull.Add(convex_hull[j + 1]); convex_hull.Add(p.points[a]);
-                        add_plain_to(convex_hull, convex_hull[j + 2], p.points[a], convex_hull[j]);
-                        //convex_hull.Add(convex_hull[j + 2]); convex_hull.Add(p.points[a]); convex_hull.Add(convex_hull[j]);
+                        add_plain_to(convex_hull, p.points[max], convex_hull[j], convex_hull[j + 1]);
+                        add_plain_to(convex_hull, convex_hull[j + 2], convex_hull[j + 1], p.points[max]);
+                        add_plain_to(convex_hull, convex_hull[j + 2], p.points[max], convex_hull[j]);
                         convex_hull.RemoveRange(j, 3);
                         j = j - 3;
                         if (i >= j && i>0) 
                             i = i - 3;
-                        outside_hull[a] = false;
+                        outside_hull[max] = false;
                     }
                 }
             }
@@ -219,6 +216,9 @@ namespace MinEllipsoid_with_visualisation
         public bool point_on_plain(Vector3d Point, List<Vector3d> convex_hull, Vector3d M0, Vector3d M1, Vector3d M2)
         {
             Console.WriteLine("Is point on plain");
+            if (Point == M0) return false;
+            if (Point == M1) return false;
+            if (Point == M2) return false;
             double ox = 0, oy = 0, oz = 0;
             int i = 0;
             for (; i < convex_hull.Count; ++i)

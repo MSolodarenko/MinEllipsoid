@@ -14,8 +14,8 @@ namespace MinEllipsoid_with_visualisation
         [STAThread]
         public static void Main()
         {
-            //Points_generator gen = new Points_generator(10);
-            //gen.runGenerator();
+            Points_generator gen = new Points_generator(10);
+            gen.runGenerator();
             Points p = new Points();
             p.ReadFromFile();
             Console.WriteLine("I start creating convex_hull");
@@ -84,31 +84,17 @@ namespace MinEllipsoid_with_visualisation
 
                     GL.MatrixMode(MatrixMode.Projection);
                     GL.LoadIdentity();
-                    GL.Ortho(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0);
+                    GL.Ortho(-5.0, 5.0, -5.0, 5.0, -7.0, 7.0);
                     GL.Scale(5, 5, 5);
 
                     Decarts_Lines();
 
-                    GL.Begin(PrimitiveType.Triangles);
-                    for (int i = 0; i < point_list.Count; ++i)
-                    {
-                        Color_Chooser(point_list[i]);
-                        GL.Vertex3(point_list[i].X, point_list[i].Y, point_list[i].Z);
-                    }
-                    GL.End();
+                    Draw_Plains(point_list);
 
-
-                    for (int i = 0; i < point_list.Count - 2; i = i + 3)
-                    {
-                        GL.Begin(PrimitiveType.LineLoop);
-                        GL.Color3(Color.Black);
-                        GL.Vertex3(point_list[i].X, point_list[i].Y, point_list[i].Z);
-                        GL.Vertex3(point_list[i + 1].X, point_list[i + 1].Y, point_list[i + 1].Z);
-                        GL.Vertex3(point_list[i + 2].X, point_list[i + 2].Y, point_list[i + 2].Z);
-                        GL.End();
-                    }
+                    Draw_Borders_of_Plains(point_list);
                     
                     DrawPoints(p, Color.Green);
+
                     game.SwapBuffers();
                 };
 
@@ -181,12 +167,12 @@ namespace MinEllipsoid_with_visualisation
             GL.Begin(PrimitiveType.Lines);
             GL.Color3(Color.Green);
             GL.Vertex3(0, 0, 0);
-            GL.Vertex3(1, 0, 0);
+            GL.Vertex3(100, 0, 0);
             GL.Color3(Color.Red);
-            GL.Vertex3(0, 1, 0);
+            GL.Vertex3(0, 100, 0);
             GL.Vertex3(0, 0, 0);
             GL.Color3(Color.Blue);
-            GL.Vertex3(0, 0, 1);
+            GL.Vertex3(0, 0, 100);
             GL.Vertex3(0, 0, 0);
             GL.End();
         }
@@ -219,6 +205,28 @@ namespace MinEllipsoid_with_visualisation
                 GL.Color3(Color.LightCyan);
             else 
                 GL.Color3(Color.White);
+        }
+        public static void Draw_Plains(List<Vector3d> point_list)
+        {
+            GL.Begin(PrimitiveType.Triangles);
+            for (int i = 0; i < point_list.Count; ++i)
+            {
+                Color_Chooser(point_list[i]);
+                GL.Vertex3(point_list[i]);
+            }
+            GL.End();
+        }
+        public static void Draw_Borders_of_Plains(List<Vector3d> point_list)
+        {
+            for (int i = 0; i < point_list.Count - 2; i = i + 3)
+            {
+                GL.Begin(PrimitiveType.LineLoop);
+                GL.Color3(Color.Black);
+                GL.Vertex3(point_list[i]);
+                GL.Vertex3(point_list[i + 1]);
+                GL.Vertex3(point_list[i + 2]);
+                GL.End();
+            }
         }
     }
 }
