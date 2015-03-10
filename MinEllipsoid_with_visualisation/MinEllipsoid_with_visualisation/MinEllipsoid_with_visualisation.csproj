@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Convex_hull.cs" />
     <Compile Include="Drawing.cs" />
+    <Compile Include="Ellipsoid.cs" />
     <Compile Include="Points.cs" />
     <Compile Include="Points_generator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

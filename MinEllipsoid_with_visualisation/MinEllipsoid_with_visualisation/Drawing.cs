@@ -14,8 +14,8 @@ namespace MinEllipsoid_with_visualisation
         [STAThread]
         public static void Main()
         {
-            Points_generator gen = new Points_generator(10);
-            gen.runGenerator();
+            //Points_generator gen = new Points_generator(10);
+            //gen.runGenerator();
             Points p = new Points();
             p.ReadFromFile();
             Console.WriteLine("I start creating convex_hull");
@@ -92,7 +92,7 @@ namespace MinEllipsoid_with_visualisation
                     Draw_Plains(point_list);
 
                     Draw_Borders_of_Plains(point_list);
-                    
+
                     DrawPoints(p, Color.Green);
 
                     game.SwapBuffers();
@@ -145,6 +145,18 @@ namespace MinEllipsoid_with_visualisation
                         break;
                 }
                 Circle(p.points[i]);
+            }
+            GL.End();
+        }
+        public void Ellips(double a, double b)          //not finished
+        {
+            GL.Begin(PrimitiveType.Points);
+            for (double angle = 1.0f; angle < 361.0f; angle += 0.2)
+            {
+                double x2 = a * Math.Cos(angle);
+                double y2 = b * Math.Sin(angle);
+                double z2 = 0;
+                GL.Vertex3(x2, y2, z2);
             }
             GL.End();
         }
