@@ -21,6 +21,7 @@ namespace MinEllipsoid_with_visualisation
             Console.WriteLine("I start creating convex_hull");
             Convex_hull p_list = new Convex_hull(p);
             List<Vector3d> point_list = p_list.Create_convex_hull();
+            Ellipsoid ell = new Ellipsoid(p, point_list);
             
             using (var game = new GameWindow(700,700))
             {
@@ -83,18 +84,19 @@ namespace MinEllipsoid_with_visualisation
                     //GL.ClearColor(Color.SkyBlue);
 
                     GL.MatrixMode(MatrixMode.Projection);
+                    
                     GL.LoadIdentity();
                     GL.Ortho(-5.0, 5.0, -5.0, 5.0, -7.0, 7.0);
                     GL.Scale(5, 5, 5);
-
+                    ell.build_Ellipsoid();
                     Decarts_Lines();
 
                     Draw_Plains(point_list);
 
                     Draw_Borders_of_Plains(point_list);
-
+                    
                     DrawPoints(p, Color.Green);
-
+                    
                     game.SwapBuffers();
                 };
 
@@ -108,7 +110,7 @@ namespace MinEllipsoid_with_visualisation
             for (int i = 0; i < p.num_of_points; ++i)
             {
                 //GL.Color3(XColor);
-                switch (i)
+                switch (i%10)
                 {
                     case 0:
                         GL.Color3(Color.Red);
