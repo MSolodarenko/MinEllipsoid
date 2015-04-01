@@ -27,11 +27,9 @@ namespace MinEllipsoid_with_visualisation
         {
             find_max_distance_between_points();
 
-            //GL.Translate((p.points[a_diam].X + p.points[b_diam].X) / 2, (p.points[a_diam].Y + p.points[b_diam].Y) / 2, (p.points[a_diam].Z + p.points[b_diam].Z) / 2);
             Translate((a_diam.X + b_diam.X) / 2, (a_diam.Y + b_diam.Y) / 2, (a_diam.Z + b_diam.Z) / 2);
-            //GL.Rotate(angle(),axis());
             Rotate(angle(), axis());
-
+            
         }
         public void Translate(double x, double y, double z)
         {
@@ -46,6 +44,12 @@ namespace MinEllipsoid_with_visualisation
                 convex_hull.RemoveAt(0);
             }
             convex_hull = temp;
+            for(int i = 0; i < p.num_of_points; ++i)
+            {
+                p.points[i].X -= x;
+                p.points[i].Y -= y;
+                p.points[i].Z -= z;
+            }
         }
         public void Rotate(double angle, Vector3d axis)
         {
@@ -62,9 +66,10 @@ namespace MinEllipsoid_with_visualisation
 
             List<Vector3d> temp = new List<Vector3d>();
             Vector3d t = new Vector3d();
+            Vector3d tmp = new Vector3d();
             while (convex_hull.Count != 0)
             {
-                Vector3d tmp = convex_hull[0];
+                tmp = convex_hull[0];
                 t.X = tmp.X * m11 + tmp.Y * m12 + tmp.Z * m13;
                 t.Y = tmp.X * m21 + tmp.Y * m22 + tmp.Z * m23;
                 t.Z = tmp.X * m31 + tmp.Y * m32 + tmp.Z * m33;
@@ -72,6 +77,13 @@ namespace MinEllipsoid_with_visualisation
                 convex_hull.RemoveAt(0);
             }
             convex_hull = temp;
+            for(int i = 0; i <p.num_of_points; ++i)
+            {
+                tmp = p.points[i];
+                p.points[i].X = tmp.X * m11 + tmp.Y * m12 + tmp.Z * m13;
+                p.points[i].Y = tmp.X * m21 + tmp.Y * m22 + tmp.Z * m23;
+                p.points[i].Z = tmp.X * m31 + tmp.Y * m32 + tmp.Z * m33;
+            }
         }
         public double angle()
         {
