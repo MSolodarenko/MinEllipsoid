@@ -9,10 +9,10 @@ namespace MinEllipsoid
 {
     class Program
     {
-        static int Main(string[] args)
+        static int Main()
         {
-            int N = 3;
-            int n = 10;
+            int N = 1;
+            int n = 5;
 
             for (int i = 1; i <= N; ++i)
             {
@@ -42,6 +42,97 @@ namespace MinEllipsoid
         {
             List<Vector3d> point_list = plane_list.Distinct().ToList();
             return point_list;
+        }
+        public static List<Vector3d> Translate(List<Vector3d> convex_hull, double x, double y, double z)
+        {
+            List<Vector3d> temp = new List<Vector3d>();
+            while (convex_hull.Count != 0)
+            {
+                Vector3d t = convex_hull[0];
+                t.X -= x;
+                t.Y -= y;
+                t.Z -= z;
+                temp.Add(t);
+                convex_hull.RemoveAt(0);
+            }
+            return temp;
+        }
+        public static List<Vector3d> Rotate(List<Vector3d> convex_hull, Vector3d a) 
+        {
+            List<Vector3d> temp = new List<Vector3d>();
+            if (a.X < 0)
+            {
+                while (convex_hull.Count != 0)
+                {
+                    Vector3d tmp = convex_hull[0];
+                    Vector3d t = new Vector3d();
+                    t.X = -tmp.X;
+                    t.Y = tmp.Y;
+                    t.Z = tmp.Z;
+                    temp.Add(t);
+                    convex_hull.RemoveAt(0);
+                }
+                a.X = -1 * a.X;
+                return Rotate(temp,a);
+            }
+            if (a.Y < 0)
+            {
+                while (convex_hull.Count != 0)
+                {
+                    Vector3d tmp = convex_hull[0];
+                    Vector3d t = new Vector3d();
+                    t.X = tmp.X;
+                    t.Y = -tmp.Y;
+                    t.Z = tmp.Z;
+                    temp.Add(t);
+                    convex_hull.RemoveAt(0);
+                }
+                a.Y = -1 * a.Y;
+                return Rotate(temp, a);
+            }
+            if (a.Z < 0)
+            {
+                while (convex_hull.Count != 0)
+                {
+                    Vector3d tmp = convex_hull[0];
+                    Vector3d t = new Vector3d();
+                    t.X = tmp.X;
+                    t.Y = tmp.Y;
+                    t.Z = -tmp.Z;
+                    temp.Add(t);
+                    convex_hull.RemoveAt(0);
+                }
+                a.Z = -1 * a.Z;
+                return Rotate(temp, a);
+            }
+            double cos_xy = a.X / (Math.Sqrt(a.X * a.X + a.Y * a.Y));
+            double sin_xy = Math.Sin(Math.Acos(cos_xy));
+            while (convex_hull.Count != 0)
+            {
+                Vector3d tmp = convex_hull[0];
+                Vector3d t = new Vector3d();
+                t.X = tmp.X*cos_xy + tmp.Y*sin_xy;
+                t.Y = -tmp.X*sin_xy + tmp.Y*cos_xy;
+                t.Z = tmp.Z;
+                temp.Add(t);
+                convex_hull.RemoveAt(0);
+            }
+            Vector3d te = a;
+            a.X = te.X * cos_xy + te.Y * sin_xy;
+            a.Y = -te.X * sin_xy + te.Y * cos_xy;
+            double cos_xz = a.X / (Math.Sqrt(a.X * a.X + a.Z * a.Z));
+            double sin_xz = Math.Sin(Math.Acos(cos_xz));
+            while (temp.Count != 0)
+            {
+                Vector3d tmp = temp[0];
+                Vector3d t = new Vector3d();
+                t.X = tmp.X * cos_xz + tmp.Z * sin_xz;
+                t.Y = tmp.Y;
+                t.Z = -tmp.X * sin_xz + tmp.Z * cos_xz;
+                convex_hull.Add(t);
+                temp.RemoveAt(0);
+            }
+            return convex_hull;
         }
     }
 }
