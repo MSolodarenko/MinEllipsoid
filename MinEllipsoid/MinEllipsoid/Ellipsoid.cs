@@ -12,5 +12,10 @@ namespace MinEllipsoid
         public double V;
         public Ellipsoid(double x, double y, double z) { a = x; b = y; c = z; }
         public Ellipsoid() { }
+        public double Volume()
+        {
+            V = (4 / 3) * Math.PI * a * b * c;
+            return V;
+        }
     }
 }
