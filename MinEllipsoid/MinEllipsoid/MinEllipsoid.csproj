@@ -46,6 +46,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Convex_hull.cs" />
+    <Compile Include="Ellipsoid.cs" />
+    <Compile Include="PetRub.cs" />
     <Compile Include="Points.cs" />
     <Compile Include="Points_generator.cs" />
     <Compile Include="Program.cs" />

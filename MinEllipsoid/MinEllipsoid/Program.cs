@@ -11,16 +11,23 @@ namespace MinEllipsoid
     {
         static int Main()
         {
-            int N = 1;
-            int n = 5;
+            int N = 100;
+            int n = 15;
 
             for (int i = 1; i <= N; ++i)
             {
                 Points p = generate_points(i, n);
+                Console.Write("*");
                 List<Vector3d> planes_hull = create_convex_hulls_plane_list(p);
+                Console.Write("*");
                 List<Vector3d> points_hull = create_convex_hulls_point_list(planes_hull);
-
+                Console.WriteLine("*");
+                PetRub ell1 = new PetRub();
+                Ellipsoid PR = ell1.PetRub_Ellipsoid(points_hull);
+                Console.WriteLine("Volume="+ PR.Volume());
+                //Console.ReadKey();
             }
+            Console.ReadKey();
             return 0;
         }
 

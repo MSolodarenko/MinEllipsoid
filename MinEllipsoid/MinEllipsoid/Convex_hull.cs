@@ -23,14 +23,14 @@ namespace MinEllipsoid
             List<Vector3d> convex_hull = new List<Vector3d>();    //Each 3 points form plain
 
             generate_EP();
-
+            //Console.Write(".");
             find_max_distance_between_EPs();
-
+            //Console.Write(".");
             find_most_distant_point_from_line_in_EP();
-
+            //Console.Write(".");
             find_most_distant_point_from_plain_in_EP();
-
-            Console.WriteLine("I'm adding 4 triangles into convex_hull");
+            //Console.Write(".");
+            //Console.WriteLine("I'm adding 4 triangles into convex_hull");
             add_plain_to(convex_hull, p.points[a], p.points[b], p.points[c]);
             add_plain_to(convex_hull, p.points[b], p.points[c], p.points[d]);
             add_plain_to(convex_hull, p.points[c], p.points[d], p.points[a]);
@@ -39,10 +39,11 @@ namespace MinEllipsoid
             bool[] outside_hull = new bool[p.num_of_points];        //status of points: false - inside (or on) hull, true - outside
             for (int i = 0; i < p.num_of_points; ++i)
                 outside_hull[i] = is_point_outside_hull(p.points[i], convex_hull);
-
+            //Console.Write(".");
             double maxDistance = 0;
             for (int i = 0; i < convex_hull.Count - 2; i = i + 3 )
             {
+                Console.Write(".");
                 maxDistance = 0;
                 for (int k=0; k < p.num_of_points; ++k)
                 {
@@ -83,7 +84,7 @@ namespace MinEllipsoid
 
             for (int i = 0; i < p.num_of_points; ++i)
             {
-                Console.WriteLine("I'm counting extreme points");
+                //Console.WriteLine("I'm counting extreme points");
                 if (p.points[i].X < p.points[ep[0]].X)
                     ep[0] = i;
                 if (p.points[i].Y < p.points[ep[1]].Y)
@@ -105,7 +106,7 @@ namespace MinEllipsoid
             for (int i = 0; i < 6; ++i)
                 for (int j = 0; j < 6; ++j)
                 {
-                    Console.WriteLine("I'm searching max distance between two EPs");
+                    //Console.WriteLine("I'm searching max distance between two EPs");
                     if (maxDistance < Points_distance(p.points[ep[i]], p.points[ep[j]]))
                     {
                         maxDistance = Points_distance(p.points[ep[i]], p.points[ep[j]]);
@@ -119,7 +120,7 @@ namespace MinEllipsoid
             double maxDistance = 0;
             for (int i = 0; i < 6; ++i)
             {
-                Console.WriteLine("I'm searching the most distant point from line");
+                //Console.WriteLine("I'm searching the most distant point from line");
                 if (ep[i] != a && ep[i] != b)
                     if (maxDistance < Point_line_distance(p.points[ep[i]], p.points[a], p.points[b]))
                     {
@@ -134,7 +135,7 @@ namespace MinEllipsoid
             d = 0;
             for (int i = 0; i < 6; ++i)
             {
-                Console.WriteLine("I'm searching the most distant point from plain");
+                //Console.WriteLine("I'm searching the most distant point from plain");
                 if (ep[i] != a)
                     if (ep[i] != b)
                         if (ep[i] != c)
@@ -147,14 +148,14 @@ namespace MinEllipsoid
         }
         public double Points_distance(Vector3d a, Vector3d b)
         {
-            Console.WriteLine("I'm counting distance between two points:"+a.ToString()+"and"+b.ToString());
+            //Console.WriteLine("I'm counting distance between two points:"+a.ToString()+"and"+b.ToString());
             double result;
             result = Math.Sqrt(Math.Pow((b.X - a.X), 2) + Math.Pow((b.Y - a.Y), 2) + Math.Pow((b.Z - a.Z), 2));
             return result;
         }
         public double Point_line_distance(Vector3d Point, Vector3d M2, Vector3d M3)
         {
-            Console.WriteLine("I'm counting distance between point and line");
+            //Console.WriteLine("I'm counting distance between point and line");
             if (Point == M2 || Point == M3) return 0;
             double ax, ay, az;
             ax = M3.X - M2.X;
@@ -172,7 +173,7 @@ namespace MinEllipsoid
         }
         public double Point_plain_distance(Vector3d Point, Vector3d M0, Vector3d M1, Vector3d M2)
         {
-            Console.WriteLine("I'm counting distance between point and plain");
+            //Console.WriteLine("I'm counting distance between point and plain");
             double A = (M1.Y - M0.Y) * (M2.Z - M0.Z) - (M2.Y - M0.Y) * (M1.Z - M0.Z);
             double B = (M1.Z - M0.Z) * (M2.X - M0.X) - (M1.X - M0.X) * (M2.Z - M0.Z);
             double C = (M1.X - M0.X) * (M2.Y - M0.Y) - (M2.X - M0.X) * (M1.Y - M0.Y);
@@ -187,7 +188,7 @@ namespace MinEllipsoid
         }
         public bool is_point_outside_hull(Vector3d Point, List<Vector3d> convex_hull)
         {
-            Console.WriteLine("Is point outside hull?");
+            //Console.WriteLine("Is point outside hull?");
             double ox = 0, oy = 0, oz = 0;
             int i = 0;
             for (; i < convex_hull.Count; ++i )
@@ -200,7 +201,7 @@ namespace MinEllipsoid
 
             for (i = 2; i < convex_hull.Count; i=i+3 )
             {
-                Console.WriteLine("I'm checking if two points are on one side for hull");
+                //Console.WriteLine("I'm checking if two points are on one side for hull");
                 double A = (convex_hull[i-1].Y - convex_hull[i-2].Y) * (convex_hull[i].Z - convex_hull[i-2].Z) - (convex_hull[i].Y - convex_hull[i-2].Y) * (convex_hull[i-1].Z - convex_hull[i-2].Z);
                 double B = (convex_hull[i-1].Z - convex_hull[i-2].Z) * (convex_hull[i].X - convex_hull[i-2].X) - (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Z - convex_hull[i-2].Z);
                 double C = (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Y - convex_hull[i-2].Y) - (convex_hull[i].X - convex_hull[i-2].X) * (convex_hull[i-1].Y - convex_hull[i-2].Y);
@@ -215,7 +216,7 @@ namespace MinEllipsoid
         }
         public bool point_on_plain(Vector3d Point, List<Vector3d> convex_hull, Vector3d M0, Vector3d M1, Vector3d M2)
         {
-            Console.WriteLine("Is point on plain");
+            //Console.WriteLine("Is point on plain");
             if (Point == M0) return false;
             if (Point == M1) return false;
             if (Point == M2) return false;
