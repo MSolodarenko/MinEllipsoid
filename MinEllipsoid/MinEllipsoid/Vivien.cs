@@ -13,6 +13,7 @@ namespace MinEllipsoid
         public List<Face> convex_hull;
         public List<Edge> edges;
         public List<Paral_planes> candidates;
+        public double[,] S;
         public Ellipsoid Vivien_Ellipsoid(List<Vector3d> planes_hull, List<Vector3d> points_hull)
         {
             convex_hull = transfigure_list_of_3points_to_faces(planes_hull);
@@ -20,8 +21,49 @@ namespace MinEllipsoid
             points = points_hull;
             candidates = new List<Paral_planes>();
             Cuboid parker = build_min_parallelepiped();
+            parker = transfigure_paral_to_cube_1x1x1(parker);
 
             return null;
+        }
+        public Cuboid transfigure_paral_to_cube_1x1x1(Cuboid parker)
+        {
+            points = Program.Translate(points, parker.A);
+            parker = Program.Translate(parker, parker.A);
+            double[,] m = new double[3, 3];
+            m[0, 0] = parker.B.X; m[1, 0] = parker.D.X; m[2, 0] = parker.A1.X;
+            m[0, 1] = parker.B.Y; m[1, 1] = parker.D.Y; m[2, 1] = parker.A1.Y;
+            m[0, 2] = parker.B.Z; m[1, 2] = parker.D.Z; m[2, 2] = parker.A1.Z;
+
+            S = Inverse(m);
+            parker = transform_cuboid_with_S(S, parker);
+            return parker;
+        }
+        public Cuboid transform_cuboid_with_S(double[,] s, Cuboid parker)
+        {
+
+            return parker;
+        }
+        public Vector3d transform_point_with_S(double[,] s, Vector3d p)
+        {
+            Vector3d t = p;
+            t.X = p.X * s[0, 0];
+        }
+        public double[,] Inverse(double[,] m)
+        {
+            double[,] result = new double[3, 3];
+            result[0, 0] = m[1, 1] * m[2, 2] - m[1, 2] * m[2, 1];
+            result[0, 1] = m[1, 0] * m[2, 2] - m[1, 2] * m[2, 0];
+            result[0, 2] = m[1, 0] * m[2, 1] - m[1, 1] * m[2, 0];
+
+            result[1, 0] = m[0, 1] * m[2, 2] - m[0, 2] * m[2, 1];
+            result[1, 1] = m[0, 0] * m[2, 2] - m[0, 2] * m[2, 0];
+            result[1, 2] = m[0, 0] * m[2, 1] - m[0, 1] * m[2, 0];
+
+            result[2, 0] = m[0, 1] * m[1, 2] - m[0, 2] * m[1, 1];
+            result[2, 1] = m[0, 0] * m[1, 2] - m[0, 2] * m[1, 0];
+            result[2, 2] = m[0, 0] * m[1, 1] - m[0, 1] * m[1, 0];
+
+            return result;
         }
         public Cuboid build_min_parallelepiped()
         {

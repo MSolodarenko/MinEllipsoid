@@ -68,6 +68,19 @@ namespace MinEllipsoid
             }
             return temp;
         }
+        public static List<Vector3d> Translate(List<Vector3d> convex_hull, Vector3d point)
+        {
+            return Translate(convex_hull, point.X, point.Y, point.Z);
+        }
+        public static Cuboid Translate(Cuboid paral, double x, double y, double z)
+        {
+            Cuboid t = new Cuboid(Translate(paral.toList_Vector3d(), x, y, z));
+            return t;
+        }
+        public static Cuboid Translate(Cuboid paral, Vector3d point)
+        {
+            return Translate(paral, point.X, point.Y, point.Z);
+        }
         public static List<Vector3d> Rotate(List<Vector3d> convex_hull, Vector3d a) 
         {
             List<Vector3d> temp = new List<Vector3d>();

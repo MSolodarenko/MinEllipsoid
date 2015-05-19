@@ -49,6 +49,11 @@ namespace MinEllipsoid
             C1 = point_from_3_faces(A1B1C1D1, DCC1D1, BB1C1C);
             D1 = point_from_3_faces(A1B1C1D1, AA1D1D, DCC1D1);
         }
+        public Cuboid(List<Vector3d> t)
+        {
+            A = t[0]; B = t[1]; C = t[2]; D = t[3];
+            A1 = t[4]; B1 = t[5]; C1 = t[6]; D1 = t[7];
+        }
         public Vector3d point_from_3_faces(Face a, Face b, Face c)
         {
             double[,] m = new double[3,4];
@@ -57,6 +62,13 @@ namespace MinEllipsoid
             m[2, 0] = c.A; m[2, 1] = c.B; m[2, 2] = c.C; m[2, 3] = c.D;
             double[] resul = Gauss.GaussSolve(m);
             Vector3d result = new Vector3d(resul[0], resul[1], resul[2]);
+            return result;
+        }
+        public List<Vector3d> toList_Vector3d()
+        {
+            List<Vector3d> result = new List<Vector3d>();
+            result.Add(A); result.Add(B); result.Add(C); result.Add(D);
+            result.Add(A1); result.Add(B1); result.Add(C1); result.Add(D1);
             return result;
         }
     }
