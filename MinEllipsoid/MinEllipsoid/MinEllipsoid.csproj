@@ -47,11 +47,13 @@
   <ItemGroup>
     <Compile Include="Convex_hull.cs" />
     <Compile Include="Ellipsoid.cs" />
+    <Compile Include="Gauss.cs" />
     <Compile Include="PetRub.cs" />
     <Compile Include="Points.cs" />
     <Compile Include="Points_generator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Vivien.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

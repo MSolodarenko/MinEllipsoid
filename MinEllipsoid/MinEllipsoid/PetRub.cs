@@ -15,22 +15,7 @@ namespace MinEllipsoid
         public int b_num;
         public List<Vector3d> points;
         public double kx, ky, kz;
-        public class Cuboid
-        {
-            public Vector3d A, B, C, D;
-            public Vector3d A1, B1, C1, D1;
-            public Cuboid()
-            {
-                A = new Vector3d();
-                B = new Vector3d();
-                C = new Vector3d();
-                D = new Vector3d();
-                A1 = new Vector3d();
-                B1 = new Vector3d();
-                C1 = new Vector3d();
-                D1 = new Vector3d();
-            }
-        }
+        
         public Ellipsoid PetRub_Ellipsoid(List<Vector3d> point_list)
         {
             points = point_list;

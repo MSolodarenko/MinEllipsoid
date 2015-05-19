@@ -43,7 +43,7 @@ namespace MinEllipsoid
             double maxDistance = 0;
             for (int i = 0; i < convex_hull.Count - 2; i = i + 3 )
             {
-                Console.Write(".");
+                if ( i%(3*4) == 0) Console.Write(".");
                 maxDistance = 0;
                 for (int k=0; k < p.num_of_points; ++k)
                 {
