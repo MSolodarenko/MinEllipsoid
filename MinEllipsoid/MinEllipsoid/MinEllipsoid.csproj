@@ -45,9 +45,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="alglibinternal.cs" />
+    <Compile Include="alglibmisc.cs" />
+    <Compile Include="ap.cs" />
     <Compile Include="Convex_hull.cs" />
+    <Compile Include="diffequations.cs" />
     <Compile Include="Ellipsoid.cs" />
+    <Compile Include="fasttransforms.cs" />
     <Compile Include="Gauss.cs" />
+    <Compile Include="linalg.cs" />
     <Compile Include="PetRub.cs" />
     <Compile Include="Points.cs" />
     <Compile Include="Points_generator.cs" />

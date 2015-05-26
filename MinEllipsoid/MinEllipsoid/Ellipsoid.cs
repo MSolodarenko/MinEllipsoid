@@ -11,11 +11,12 @@ namespace MinEllipsoid
     {
         public double a, b, c;
         public double V;
-        public Ellipsoid(double x, double y, double z) { a = x; b = y; c = z; }
+        public double volume_of_paral;
+        public Ellipsoid(double x, double y, double z) { a = x; b = y; c = z; V = Volume(); }
         public Ellipsoid() { }
         public double Volume()
         {
-            V = (4 / 3) * Math.PI * a * b * c;
+            V = (Math.PI * a * b * c) * 4 / 3;
             return V;
         }
     }
@@ -57,9 +58,9 @@ namespace MinEllipsoid
         public Vector3d point_from_3_faces(Face a, Face b, Face c)
         {
             double[,] m = new double[3,4];
-            m[0, 0] = a.A; m[0, 1] = a.B; m[0, 2] = a.C; m[0, 3] = a.D;
-            m[1, 0] = b.A; m[1, 1] = b.B; m[1, 2] = b.C; m[1, 3] = b.D;
-            m[2, 0] = c.A; m[2, 1] = c.B; m[2, 2] = c.C; m[2, 3] = c.D;
+            m[0, 0] = a.A; m[0, 1] = a.B; m[0, 2] = a.C; m[0, 3] = -1 * a.D;
+            m[1, 0] = b.A; m[1, 1] = b.B; m[1, 2] = b.C; m[1, 3] = -1 * b.D;
+            m[2, 0] = c.A; m[2, 1] = c.B; m[2, 2] = c.C; m[2, 3] = -1 * c.D;
             double[] resul = Gauss.GaussSolve(m);
             Vector3d result = new Vector3d(resul[0], resul[1], resul[2]);
             return result;
@@ -69,6 +70,17 @@ namespace MinEllipsoid
             List<Vector3d> result = new List<Vector3d>();
             result.Add(A); result.Add(B); result.Add(C); result.Add(D);
             result.Add(A1); result.Add(B1); result.Add(C1); result.Add(D1);
+            return result;
+        }
+        public double volume()
+        {
+            double result;
+            Vector3d a, b, c;
+            //AB, AD, AA1
+            a = new Vector3d(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
+            b = new Vector3d(D.X - A.X, D.Y - A.Y, D.Z - A.Z);
+            c = new Vector3d(A1.X - A.X, A1.Y - A.Y, A1.Z - A.Z);
+            result = Math.Abs(a.X * (b.Y * c.Z - b.Z * c.Y) - a.Y * (b.X * c.Z - b.Z * c.X) + a.Z * (b.X * c.Y - c.X * b.Y));
             return result;
         }
     }
@@ -89,21 +101,21 @@ namespace MinEllipsoid
             A = normal.X; B = normal.Y; C = normal.Z;
             D = -1 * (normal.X * point.X + normal.Y * point.Y + normal.Z * point.Z);
         }
-        public Face(Edge d1, Edge d2)
-        {
-            Vector3d m1 = d1.A;
-            Vector3d p1 = new Vector3d(d1.B.X - d1.A.X, d1.B.Y - d1.A.Y, d1.B.Z - d1.A.Z);
-            Vector3d p2 = new Vector3d(d2.B.X - d2.A.X, d2.B.Y - d2.A.Y, d2.B.Z - d2.A.Z);
-            A = p1.Y * p2.Z - p2.Y * p1.Z;
-            B = p1.Z * p2.X - p1.X * p2.Z;
-            C = p1.X * p2.Y - p2.X * p1.Y;
-            D = -m1.X * (p1.Y * p2.Z - p2.Y * p1.Z) - m1.Y * (p1.Z * p2.X - p1.X * p2.Z) - m1.Z * (p1.X * p2.Y - p2.X * p1.Y);
-        }
-        public Face(Face d, Vector3d p)
-        {
-            A = d.A; B = d.B; C = d.C;
-            D = -A * p.X - B * p.Y - C * p.Z;
-        }
+        //public Face(Edge d1, Edge d2)
+        //{
+        //    Vector3d m1 = d1.A;
+        //    Vector3d p1 = new Vector3d(d1.B.X - d1.A.X, d1.B.Y - d1.A.Y, d1.B.Z - d1.A.Z);
+        //    Vector3d p2 = new Vector3d(d2.B.X - d2.A.X, d2.B.Y - d2.A.Y, d2.B.Z - d2.A.Z);
+        //    A = p1.Y * p2.Z - p2.Y * p1.Z;
+        //    B = p1.Z * p2.X - p1.X * p2.Z;
+        //    C = p1.X * p2.Y - p2.X * p1.Y;
+        //    D = -m1.X * (p1.Y * p2.Z - p2.Y * p1.Z) - m1.Y * (p1.Z * p2.X - p1.X * p2.Z) - m1.Z * (p1.X * p2.Y - p2.X * p1.Y);
+        //}
+        //public Face(Face d, Vector3d p)
+        //{
+        //    A = d.A; B = d.B; C = d.C;
+        //    D = -A * p.X - B * p.Y - C * p.Z;
+        //}
         public double formula(Vector3d t)
         {
             return A * t.X + B * t.Y + C * t.Z + D;
@@ -169,6 +181,19 @@ namespace MinEllipsoid
             Vector3d dobby = new Vector3d(nx, ny, nz);
             A = a; B = b; N = dobby;
         }
+        public Paral_planes(Edge a, Edge b)
+        {
+            double i = 0, j = 0, k = 0;
+            //double m11 = i, m12 = j, m13 = k;
+            double m21 = a.B.X - a.A.X, m22 = a.B.Y - a.A.Y, m23 = a.B.Z - a.A.Z;
+            double m31 = b.B.X - b.A.X, m32 = b.B.Y - b.A.Y, m33 = b.B.Z - b.A.Z;
+            i = m22 * m33 - m23 * m32;
+            j = m23 * m31 - m21 * m33;
+            k = m21 * m32 - m22 * m31;
+            N = new Vector3d(i, j, k);
+            A = new Face(N, a.A);
+            B = new Face(N, b.A);
+        }
         public bool equals(Paral_planes jack)
         {
             if (this.A.equals(jack.A))
@@ -185,11 +210,21 @@ namespace MinEllipsoid
         public Vector3d A, B;
         public Edge() { }
         public Edge(Vector3d a, Vector3d b) { A = a; B = b; }
+        //public bool is_on_one_plane_with(Edge alex)
+        //{
+        //    double m11 = this.A.X - alex.A.X, m12 = this.A.Y - alex.A.Y, m13 = this.A.Z - alex.A.Z;
+        //    double m21 = this.B.X - this.A.X, m22 = this.B.Y - this.A.Y, m23 = this.B.Z - this.A.Z;
+        //    double m31 = alex.B.X - alex.A.X, m32 = alex.B.Y - alex.A.Y, m33 = alex.B.Z - alex.A.Z;
+        //    double div = m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32 - m13 * m22 * m31 - m23 * m32 * m11 - m33 * m12 * m21;
+        //    if (Math.Abs(div) < 0.00000001)
+        //        return true;
+        //    return false;
+        //}
         public bool is_on_one_plane_with(Edge alex)
         {
-            double m11 = this.A.X - alex.A.X, m12 = this.A.Y - alex.A.Y, m13 = this.A.Z - alex.A.Z;
-            double m21 = this.B.X - this.A.X, m22 = this.B.Y - this.A.Y, m23 = this.B.Z - this.A.Z;
-            double m31 = alex.B.X - alex.A.X, m32 = alex.B.Y - alex.A.Y, m33 = alex.B.Z - alex.A.Z;
+            double m11 = this.B.X - this.A.X, m12 = alex.B.X - alex.A.X, m13 = alex.A.X - this.A.X;
+            double m21 = this.B.Y - this.A.Y, m22 = alex.B.Y - alex.A.Y, m23 = alex.A.Y - this.A.Y;
+            double m31 = this.B.Z - this.A.Z, m32 = alex.B.Z - alex.A.Z, m33 = alex.A.Z - this.A.Z;
             double div = m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32 - m13 * m22 * m31 - m23 * m32 * m11 - m33 * m12 * m21;
             if (Math.Abs(div) < 0.00000001)
                 return true;

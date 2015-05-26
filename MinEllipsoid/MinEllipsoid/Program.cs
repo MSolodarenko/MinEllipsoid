@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using System.IO;
 
 namespace MinEllipsoid
 {
@@ -11,30 +12,80 @@ namespace MinEllipsoid
     {
         static int Main()
         {
-            int N = 10;
+            int N = 15;
             int n = 10;
+
+            StreamWriter sw = new StreamWriter(@"output.txt");
+
+            Ellipsoid[] PR = new Ellipsoid[N+1];
+            Ellipsoid[] Vi = new Ellipsoid[N+1];
 
             for (int i = 1; i <= N; ++i)
             {
                 Points p = generate_points(i, n);
+
                 Console.Write("*");
                 List<Vector3d> planes_hull = create_convex_hulls_plane_list(p);
-                Console.Write("*");
-                List<Vector3d> points_hull = create_convex_hulls_point_list(planes_hull);
                 Console.WriteLine("*");
+                List<Vector3d> points_hull = create_convex_hulls_point_list(planes_hull);
 
-                //PetRub ell1 = new PetRub();
-                //Ellipsoid PR = ell1.PetRub_Ellipsoid(points_hull);
-                //Console.WriteLine(i.ToString()+")   VolumePR = "+ PR.Volume());
+                PetRub ell1 = new PetRub();
+                PR[i] = ell1.PetRub_Ellipsoid(points_hull);
+                
+                points_hull = create_convex_hulls_point_list(planes_hull);
 
                 Vivien ell2 = new Vivien();
-                Ellipsoid Viv = ell2.Vivien_Ellipsoid(planes_hull, points_hull);
-                Console.WriteLine(i.ToString() + ")   VolumeViv =" + Viv.Volume());
+                Vi[i] = ell2.Vivien_Ellipsoid(planes_hull, points_hull);
+
+                Console.WriteLine("");
+                Console.WriteLine(i.ToString() + ")   VolumePR = " + PR[i].Volume());
+                Console.WriteLine(i.ToString() + ")   VolumeVi = " + Vi[i].Volume());
+                Console.WriteLine("");
+                Console.WriteLine("Volume of paral PR = " + PR[i].volume_of_paral);
+                Console.WriteLine("Volume of paral Vi= " + Vi[i].volume_of_paral);
+                Console.WriteLine("");
+
+                sw.WriteLine(i.ToString() + ")   VolumePR = " + PR[i].Volume());
+                sw.WriteLine(i.ToString() + ")   VolumeVi = " + Vi[i].Volume());
+                sw.WriteLine("Volume of paral PR = " + PR[i].volume_of_paral);
+                sw.WriteLine("Volume of paral Vi = " + Vi[i].volume_of_paral);
+                sw.WriteLine("");
             }
+            sw.Close();
+            //double[,] matrix = new double[,] { { 1, 2}, { 2, 3 }};
+            //double[] result = Gauss.Diagonal(matrix);
+
+            output_results_file(PR, Vi, N, n);
+
             Console.ReadKey();
             return 0;
         }
-
+        public static void output_results_file(Ellipsoid[] PR, Ellipsoid[] VI, int n, int numb_of_points)
+        {
+            StreamWriter sw = new StreamWriter(@"results.txt");
+            double a = 0, b = 0;
+            for (int i = 1; i <= n; ++i )
+            {
+                //double t = 1 - ( VI[i].Volume() / PR[i].Volume() );
+                //double t1 = 1 - (VI[i].volume_of_paral / PR[i].volume_of_paral);
+                double t = VI[i].Volume() / PR[i].Volume();
+                double t1 = VI[i].volume_of_paral / PR[i].volume_of_paral;
+                a += t;
+                b += t1;
+            }
+            a /= n;
+            b /= n;
+            //a *= 100;
+            //b *= 100;
+            a = Math.Round(a, 4);
+            b = Math.Round(b, 4);
+            sw.WriteLine("Number of tests = " + n.ToString());
+            sw.WriteLine("Number of points = " + numb_of_points.ToString());
+            sw.WriteLine("Average ratio between volumes of ellipsoids (Vi/PR) = " + a.ToString());
+            sw.WriteLine("Average ratio between volumes of parallelepipeds (Vi/PR) = " + b.ToString());
+            sw.WriteLine("");
+            sw.Close();
+        }
         public static Points generate_points(int N, int n)
         {
             Points_generator g = new Points_generator(n);

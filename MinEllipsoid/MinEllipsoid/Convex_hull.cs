@@ -41,11 +41,11 @@ namespace MinEllipsoid
                 outside_hull[i] = is_point_outside_hull(p.points[i], convex_hull);
             //Console.Write(".");
             double maxDistance = 0;
-            for (int i = 0; i < convex_hull.Count - 2; i = i + 3 )
+            for (int i = 0; i < convex_hull.Count - 2; i = i + 3)
             {
                 if ( i%(3*4) == 0) Console.Write(".");
                 maxDistance = 0;
-                for (int k=0; k < p.num_of_points; ++k)
+                for (int k = 0; k < p.num_of_points; ++k)
                 {
                     if (outside_hull[k])
                     {
@@ -59,16 +59,16 @@ namespace MinEllipsoid
                         }
                     }
                 }
-                for (int j = 0; j < convex_hull.Count - 2; j = j + 3 )
+                for (int j = 0; j < convex_hull.Count - 2; j = j + 3)
                 {
-                    if (point_on_plain(p.points[max], convex_hull, convex_hull[j], convex_hull[j+1], convex_hull[j+2]))
+                    if (point_on_plain(p.points[max], convex_hull, convex_hull[j], convex_hull[j + 1], convex_hull[j + 2]))
                     {
                         add_plain_to(convex_hull, p.points[max], convex_hull[j], convex_hull[j + 1]);
                         add_plain_to(convex_hull, convex_hull[j + 2], convex_hull[j + 1], p.points[max]);
                         add_plain_to(convex_hull, convex_hull[j + 2], p.points[max], convex_hull[j]);
                         convex_hull.RemoveRange(j, 3);
                         j = j - 3;
-                        if (i >= j && i>0) 
+                        if (i >= j && i > 0)
                             i = i - 3;
                         outside_hull[max] = false;
                     }
@@ -105,15 +105,16 @@ namespace MinEllipsoid
             a = 0; b = 0;                       // The most distant points of EPs
             for (int i = 0; i < 6; ++i)
                 for (int j = 0; j < 6; ++j)
-                {
-                    //Console.WriteLine("I'm searching max distance between two EPs");
-                    if (maxDistance < Points_distance(p.points[ep[i]], p.points[ep[j]]))
+                    if (i != j)
                     {
-                        maxDistance = Points_distance(p.points[ep[i]], p.points[ep[j]]);
-                        a = ep[i];
-                        b = ep[j];
+                        //Console.WriteLine("I'm searching max distance between two EPs");
+                        if (maxDistance < Points_distance(p.points[ep[i]], p.points[ep[j]]))
+                        {
+                            maxDistance = Points_distance(p.points[ep[i]], p.points[ep[j]]);
+                            a = ep[i];
+                            b = ep[j];
+                        }
                     }
-                }
         }
         public void find_most_distant_point_from_line_in_EP()
         {
@@ -168,7 +169,7 @@ namespace MinEllipsoid
             double k = ax * (Point.Y - M3.Y) - ay * (Point.X - M3.X);     //
             double a_PointM3_mod = Math.Sqrt(i * i + j * j + k * k);
             if (a_mod != 0)
-                return (a_PointM3_mod/a_mod);
+                return (a_PointM3_mod / a_mod);
             return 0;
         }
         public double Point_plain_distance(Vector3d Point, Vector3d M0, Vector3d M1, Vector3d M2)
@@ -191,7 +192,7 @@ namespace MinEllipsoid
             //Console.WriteLine("Is point outside hull?");
             double ox = 0, oy = 0, oz = 0;
             int i = 0;
-            for (; i < convex_hull.Count; ++i )
+            for (; i < convex_hull.Count; ++i)
             {
                 ox += convex_hull[i].X;
                 oy += convex_hull[i].Y;
@@ -199,20 +200,20 @@ namespace MinEllipsoid
             }
             ox = ox / (double)i; oy = oy / (double)i; oz = oz / (double)i;
 
-            for (i = 2; i < convex_hull.Count; i=i+3 )
+            for (i = 2; i < convex_hull.Count; i = i + 3)
             {
                 //Console.WriteLine("I'm checking if two points are on one side for hull");
-                double A = (convex_hull[i-1].Y - convex_hull[i-2].Y) * (convex_hull[i].Z - convex_hull[i-2].Z) - (convex_hull[i].Y - convex_hull[i-2].Y) * (convex_hull[i-1].Z - convex_hull[i-2].Z);
-                double B = (convex_hull[i-1].Z - convex_hull[i-2].Z) * (convex_hull[i].X - convex_hull[i-2].X) - (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Z - convex_hull[i-2].Z);
-                double C = (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Y - convex_hull[i-2].Y) - (convex_hull[i].X - convex_hull[i-2].X) * (convex_hull[i-1].Y - convex_hull[i-2].Y);
-                double D = convex_hull[i-2].X * ((convex_hull[i].Y - convex_hull[i-2].Y) * (convex_hull[i-1].Z - convex_hull[i-2].Z) - (convex_hull[i-1].Y - convex_hull[i-2].Y) * (convex_hull[i].Z - convex_hull[i-2].Z)) + convex_hull[i-2].Y * ((convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Z - convex_hull[i-2].Z) - (convex_hull[i-1].Z - convex_hull[i-2].Z) * (convex_hull[i].X - convex_hull[i-2].X)) + convex_hull[i-2].Z * ((convex_hull[i].X - convex_hull[i-2].X) * (convex_hull[i-1].Y - convex_hull[i-2].Y) - (convex_hull[i-1].X - convex_hull[i-2].X) * (convex_hull[i].Y - convex_hull[i-2].Y));
+                double A = (convex_hull[i - 1].Y - convex_hull[i - 2].Y) * (convex_hull[i].Z - convex_hull[i - 2].Z) - (convex_hull[i].Y - convex_hull[i - 2].Y) * (convex_hull[i - 1].Z - convex_hull[i - 2].Z);
+                double B = (convex_hull[i - 1].Z - convex_hull[i - 2].Z) * (convex_hull[i].X - convex_hull[i - 2].X) - (convex_hull[i - 1].X - convex_hull[i - 2].X) * (convex_hull[i].Z - convex_hull[i - 2].Z);
+                double C = (convex_hull[i - 1].X - convex_hull[i - 2].X) * (convex_hull[i].Y - convex_hull[i - 2].Y) - (convex_hull[i].X - convex_hull[i - 2].X) * (convex_hull[i - 1].Y - convex_hull[i - 2].Y);
+                double D = convex_hull[i - 2].X * ((convex_hull[i].Y - convex_hull[i - 2].Y) * (convex_hull[i - 1].Z - convex_hull[i - 2].Z) - (convex_hull[i - 1].Y - convex_hull[i - 2].Y) * (convex_hull[i].Z - convex_hull[i - 2].Z)) + convex_hull[i - 2].Y * ((convex_hull[i - 1].X - convex_hull[i - 2].X) * (convex_hull[i].Z - convex_hull[i - 2].Z) - (convex_hull[i - 1].Z - convex_hull[i - 2].Z) * (convex_hull[i].X - convex_hull[i - 2].X)) + convex_hull[i - 2].Z * ((convex_hull[i].X - convex_hull[i - 2].X) * (convex_hull[i - 1].Y - convex_hull[i - 2].Y) - (convex_hull[i - 1].X - convex_hull[i - 2].X) * (convex_hull[i].Y - convex_hull[i - 2].Y));
 
                 if (A * ox + B * oy + C * oz + D > 0 && A * Point.X + B * Point.Y + C * Point.Z + D < 0)
                     return true;
                 if (A * ox + B * oy + C * oz + D < 0 && A * Point.X + B * Point.Y + C * Point.Z + D > 0)
                     return true;
             }
-                return false;
+            return false;
         }
         public bool point_on_plain(Vector3d Point, List<Vector3d> convex_hull, Vector3d M0, Vector3d M1, Vector3d M2)
         {
@@ -243,7 +244,41 @@ namespace MinEllipsoid
         }
         public void add_plain_to(List<Vector3d> convex_hull, Vector3d Point1, Vector3d Point2, Vector3d Point3)
         {
-            convex_hull.Add(Point1); convex_hull.Add(Point2); convex_hull.Add(Point3);
+            if (Points_distance(Point1, Point2) > 0.0000001)
+                if (Points_distance(Point2, Point3) > 0.0000001)
+                    if (Points_distance(Point1, Point3) > 0.0000001)
+                        //if (is_plane_in_convex_hull(convex_hull, Point1, Point2, Point3))
+                        { convex_hull.Add(Point1); convex_hull.Add(Point2); convex_hull.Add(Point3); }
         }
+        //    public bool is_plane_in_convex_hull(List<Vector3d> convex_hull, Vector3d Point1, Vector3d Point2, Vector3d Point3)
+        //    {
+        //        for (int j = 0; j < convex_hull.Count - 2; j = j + 3 )
+        //        {
+        //            if (plane_equals_plane(convex_hull[j],convex_hull[j+1],convex_hull[j+2],Point1,Point2,Point3))
+        //                return true;
+        //        }
+        //        return false;
+        //    }
+        //    public bool plane_equals_plane(Vector3d a1,Vector3d a2,Vector3d a3, Vector3d b1, Vector3d b2, Vector3d b3)
+        //    {
+        //        if (a1.Equals(b1))
+        //            if (a2.Equals(b2))
+        //                if (a3.Equals(b3))
+        //                    return true;
+
+        //        if (a1.Equals(b2))
+        //            if (a2.Equals(b3))
+        //                if (a3.Equals(b1))
+        //                    return true;
+
+        //        if (a1.Equals(b3))
+        //            if (a2.Equals(b1))
+        //                if (a3.Equals(b2))
+        //                    return true;
+
+        //        return false;
+        //    }
+        //}
     }
 }
+

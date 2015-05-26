@@ -21,12 +21,16 @@ namespace MinEllipsoid
             points = point_list;
             find_most_distant_points();
             translate_and_rotate_space_on_diam();
+            
             Cuboid harry = build_min_cuboid();
+            
+            double vol = harry.volume();
             harry = center_cuboid(harry);
             transfigure_cuboid_to_cube_1x1x1(harry);
             Ellipsoid potter = build_sphere();
             potter = transfigure_sphere_to_ellipsoid(potter);
             bool all_ok = check(potter);
+            potter.volume_of_paral = vol;
             return potter;
         }
         public bool check(Ellipsoid alastor)
