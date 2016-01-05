@@ -14,15 +14,18 @@ namespace MinEllipsoid_with_visualisation
         [STAThread]
         public static void Main()
         {
-            //Points_generator gen = new Points_generator(10);
+            //Points_generator gen = new Points_generator(15);
             //gen.runGenerator();
             Points p = new Points();
             p.ReadFromFile();
             Console.WriteLine("I start creating convex_hull");
             Convex_hull p_list = new Convex_hull(p);
-            List<Vector3d> point_list = p_list.Create_convex_hull();
-            Ellipsoid ell = new Ellipsoid(p, point_list);
-            
+            //List<Vector3d> point_list = p_list.Create_convex_hull();
+            List<List<Vector3d>> point_list = p_list.Create_convex_hull();
+            //Ellipsoid ell = new Ellipsoid(p, point_list);
+
+            int iter = 0;
+
             using (var game = new GameWindow(700,700))
             {
                 game.Load += (sender, e) =>
@@ -73,6 +76,17 @@ namespace MinEllipsoid_with_visualisation
                         GL.MatrixMode(MatrixMode.Modelview);
                         GL.Scale(0.99, 0.99, 0.99);
                     }
+                    if (game.Keyboard[Key.M])
+                    {
+                        if (iter < point_list.Count-1)
+                            iter++;
+                        else iter = point_list.Count - 1;
+                    }
+                    if (game.Keyboard[Key.N])
+                    {
+                        if (iter > 0)
+                            iter--;
+                    }
                 };
 
                 game.RenderFrame += (sender, e) =>
@@ -88,12 +102,14 @@ namespace MinEllipsoid_with_visualisation
                     GL.LoadIdentity();
                     GL.Ortho(-5.0, 5.0, -5.0, 5.0, -7.0, 7.0);
                     GL.Scale(5, 5, 5);
-                    ell.build_Ellipsoid();
+                    //ell.build_Ellipsoid();
                     Decarts_Lines();
 
-                    Draw_Plains(point_list);
+                    DrawAlgo(point_list, iter);
 
-                    Draw_Borders_of_Plains(point_list);
+                    //Draw_Plains(point_list);
+
+                    //Draw_Borders_of_Plains(point_list);
                     
                     DrawPoints(p, Color.Green);
                     
@@ -103,6 +119,15 @@ namespace MinEllipsoid_with_visualisation
                 // Run the game at 60 updates per second
                 game.Run(60.0);
             }    
+        }
+        public static void DrawAlgo(List<List<Vector3d>> res, int iter)
+        {
+            if (iter < res.Count)
+            {
+                Draw_Plains(res[iter]);
+
+                Draw_Borders_of_Plains(res[iter]);
+            }
         }
         public static void DrawPoints(Points p, Color XColor)     
         {

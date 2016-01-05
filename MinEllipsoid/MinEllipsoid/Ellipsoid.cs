@@ -80,7 +80,7 @@ namespace MinEllipsoid
             a = new Vector3d(B.X - A.X, B.Y - A.Y, B.Z - A.Z);
             b = new Vector3d(D.X - A.X, D.Y - A.Y, D.Z - A.Z);
             c = new Vector3d(A1.X - A.X, A1.Y - A.Y, A1.Z - A.Z);
-            result = Math.Abs(a.X * (b.Y * c.Z - b.Z * c.Y) - a.Y * (b.X * c.Z - b.Z * c.X) + a.Z * (b.X * c.Y - c.X * b.Y));
+            result = Math.Abs(a.X * (b.Y * c.Z - b.Z * c.Y) + a.Y * (b.Z * c.X - b.X * c.Z) + a.Z * (b.X * c.Y - b.Y * c.X));
             return result;
         }
     }

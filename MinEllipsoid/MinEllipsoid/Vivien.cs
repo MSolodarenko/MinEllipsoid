@@ -14,24 +14,59 @@ namespace MinEllipsoid
         public List<Edge> edges;
         public List<Paral_planes> candidates;
         public double[,] SM;
-        public Ellipsoid Vivien_Ellipsoid(List<Vector3d> planes_hull, List<Vector3d> points_hull)
+        public Ellipsoid Vivien_Ellipsoid(List<Vector3d> planes_hull, List<Vector3d> points_hull, bool enable_log)
         {
             convex_hull = transfigure_list_of_3points_to_faces(planes_hull);
+            if (enable_log) Console.WriteLine("transfigure_list_of_3points_to_faces");
             edges = transfigure_list_of_3points_to_edges(planes_hull);
+            if (enable_log) Console.WriteLine("transfigure_list_of_3points_to_edges");
             points = points_hull;
             candidates = new List<Paral_planes>();
             Cuboid parker = build_min_parallelepiped();
+            if (enable_log) Console.WriteLine("build_min_parallelepiped");
             points = Program.Translate(points, parker.A);
             parker = Program.Translate(parker, parker.A);
 
             double vol = parker.volume();
+            if (enable_log) Console.WriteLine("counting volume of cuboid");
             
             parker = transfigure_paral_to_cube_1x1x1(parker);
+            if (enable_log) Console.WriteLine("transfigure_paral_to_cube_1x1x1");
             double radius = find_radius_of_sphere();
+            if (enable_log) Console.WriteLine("find_radius_of_sphere");
             parker = transfigure_cube_to_paral(parker);
+            if (enable_log) Console.WriteLine("transfigure_cube_to_paral");
             Ellipsoid result = build_ellipsoid_with_(radius);
+            if (enable_log) Console.WriteLine("build_ellipsoid_with_(radius)");
             result.volume_of_paral = vol;
             return result;
+        }
+        public Cuboid build_min_parallelepiped()
+        {
+            set_candidates_from_faces();
+            set_candidates_from_edges();
+
+            Cuboid peter = new Cuboid();
+
+            double vol_min = 10000000;
+
+            for (int i = 0; i < candidates.Count(); ++i)
+                for (int j = i; j < candidates.Count(); ++j)
+                        for (int k = j; k < candidates.Count(); ++k)
+                                {
+                                    double t = triple_product_abs(candidates[i].N, candidates[j].N, candidates[k].N);
+                                    if (t > 0.000001)
+                                    {
+                                        Cuboid parker = new Cuboid(candidates[i], candidates[j], candidates[k]);
+                                        double vol = parker.volume();
+                                        if (vol < vol_min)
+                                        {
+                                            vol_min = vol;
+                                            peter = parker;
+                                        }
+                                    }
+                                }
+            return peter;
         }
         //public Ellipsoid build_ellipsoid_with_(double r)
         //{
@@ -365,47 +400,6 @@ namespace MinEllipsoid
 
             return result;
         }
-        public Cuboid build_min_parallelepiped()
-        {
-            set_candidates_from_faces();
-            set_candidates_from_edges();
-
-            Cuboid peter = new Cuboid();
-
-            double vol_min = 10000000;
-            int f1=0, f2=0, f3=0;
-            for (int i = 0; i < candidates.Count(); ++i)
-                for (int j = 0; j < candidates.Count(); ++j)
-                    for (int k = 0; k < candidates.Count(); ++k )
-                        if (i != j)
-                            if (j!=k)
-                                if (i!=k)
-                                {
-                                    double t = triple_product_abs(candidates[i].N, candidates[j].N, candidates[k].N);
-                                    if (t > 0.000001)
-                                    {
-                                        Cuboid parker = new Cuboid(candidates[i], candidates[j], candidates[k]);
-                                        double vol = parker.volume();
-
-                                        //double vol = Math.Abs(Math.Pow(norm_vector(candidates[i].N) * norm_vector(candidates[j].N) * norm_vector(candidates[k].N), 2) / triple_product_abs(candidates[i].N, candidates[j].N, candidates[k].N));
-                                        if (vol < vol_min)
-                                        {
-                                            vol_min = vol;
-                                            peter = parker;
-                                            //f1 = i;
-                                            //f2 = j;
-                                            //f3 = k;
-                                        }
-                                    }
-                                }
-            //Cuboid peter = new Cuboid(candidates[f1], candidates[f2], candidates[f3]);
-
-            //bool all_points_inside = paral_planes_contains_points(candidates[f1]);
-            //all_points_inside = paral_planes_contains_points(candidates[f2]);
-            //all_points_inside = paral_planes_contains_points(candidates[f3]);
-
-            return peter;
-        }
         public double norm_vector(Vector3d a)
         {
             double result = Math.Sqrt(a.X * a.X + a.Y * a.Y + a.Z * a.Z);
@@ -428,10 +422,6 @@ namespace MinEllipsoid
                     {
                         if (!edges[i].is_on_one_plane_with(edges[j]))
                         {
-                            //Face f1 = new Face(edges[i], edges[j]);
-                            //Face f2 = new Face(f1, edges[j].A);
-                            //Vector3d normal = new Vector3d(f1.A, f1.B, f1.C);
-                            //Paral_planes malt = new Paral_planes(f1,f2,normal);
                             Paral_planes malt = new Paral_planes(edges[i], edges[j]);
                             if (paral_planes_contains_points(malt))
                                 if (not_in_candidates(malt)) 
