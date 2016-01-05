@@ -33,5 +33,21 @@ namespace MinEllipsoid_with_visualisation
 
             sr.Close();
         }
+        public Points(Vector3d[] p)
+        {
+            points = p;
+            num_of_points = p.Length;
+        }
+        public Points(Points t)
+        {
+            num_of_points = t.num_of_points;
+            t.points.CopyTo(points, 0);
+        }
+        public Points(List<Vector3d> t)
+        {
+            num_of_points = t.Count;
+            t.CopyTo(points);
+        }
+        public Points() { }
     }
 }

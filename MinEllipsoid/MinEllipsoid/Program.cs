@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
 using System.IO;
+using MIConvexHull;
 
 namespace MinEllipsoid
 {
@@ -12,17 +13,19 @@ namespace MinEllipsoid
     {
         static int Main()
         {
-            int N = 15;
-            int n = 10;
+            int N = 10;
+            int number_of_points = 50;
+
+            bool enable_log = false;
 
             StreamWriter sw = new StreamWriter(@"output.txt");
 
             Ellipsoid[] PR = new Ellipsoid[N+1];
             Ellipsoid[] Vi = new Ellipsoid[N+1];
-
+            sw.WriteLine("    VolumePR VolumeVi Paral_PR Paral_Vi ");
             for (int i = 1; i <= N; ++i)
             {
-                Points p = generate_points(i, n);
+                Points p = generate_points(i, number_of_points);
 
                 Console.Write("*");
                 List<Vector3d> planes_hull = create_convex_hulls_plane_list(p);
@@ -31,11 +34,11 @@ namespace MinEllipsoid
 
                 PetRub ell1 = new PetRub();
                 PR[i] = ell1.PetRub_Ellipsoid(points_hull);
-                
+                Console.Write("*");
                 points_hull = create_convex_hulls_point_list(planes_hull);
 
                 Vivien ell2 = new Vivien();
-                Vi[i] = ell2.Vivien_Ellipsoid(planes_hull, points_hull);
+                Vi[i] = ell2.Vivien_Ellipsoid(planes_hull, points_hull, enable_log);
 
                 Console.WriteLine("");
                 Console.WriteLine(i.ToString() + ")   VolumePR = " + PR[i].Volume());
@@ -52,10 +55,8 @@ namespace MinEllipsoid
                 sw.WriteLine("");
             }
             sw.Close();
-            //double[,] matrix = new double[,] { { 1, 2}, { 2, 3 }};
-            //double[] result = Gauss.Diagonal(matrix);
 
-            output_results_file(PR, Vi, N, n);
+            output_results_file(PR, Vi, N, number_of_points);
 
             Console.ReadKey();
             return 0;
@@ -66,8 +67,6 @@ namespace MinEllipsoid
             double a = 0, b = 0;
             for (int i = 1; i <= n; ++i )
             {
-                //double t = 1 - ( VI[i].Volume() / PR[i].Volume() );
-                //double t1 = 1 - (VI[i].volume_of_paral / PR[i].volume_of_paral);
                 double t = VI[i].Volume() / PR[i].Volume();
                 double t1 = VI[i].volume_of_paral / PR[i].volume_of_paral;
                 a += t;
@@ -75,8 +74,6 @@ namespace MinEllipsoid
             }
             a /= n;
             b /= n;
-            //a *= 100;
-            //b *= 100;
             a = Math.Round(a, 4);
             b = Math.Round(b, 4);
             sw.WriteLine("Number of tests = " + n.ToString());
@@ -97,6 +94,7 @@ namespace MinEllipsoid
         public static List<Vector3d> create_convex_hulls_plane_list(Points p)
         {
             Convex_hull p_list = new Convex_hull(p);
+            //List<Vector3d> plane_list = p_list.Create_convex_hull();
             List<Vector3d> plane_list = p_list.Create_convex_hull();
             return plane_list;
         }

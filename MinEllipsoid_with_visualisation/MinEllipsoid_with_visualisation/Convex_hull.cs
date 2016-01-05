@@ -18,9 +18,11 @@ namespace MinEllipsoid_with_visualisation
         {
             p = temp;
         }
-        public List<Vector3d> Create_convex_hull()
+        public List<List<Vector3d>> Create_convex_hull_ver_2()
         {
             List<Vector3d> convex_hull = new List<Vector3d>();    //Each 3 points form plain
+
+            List<List<Vector3d>> res = new List<List<Vector3d>>();
 
             generate_EP();
 
@@ -35,6 +37,82 @@ namespace MinEllipsoid_with_visualisation
             add_plain_to(convex_hull, p.points[b], p.points[c], p.points[d]);
             add_plain_to(convex_hull, p.points[c], p.points[d], p.points[a]);
             add_plain_to(convex_hull, p.points[d], p.points[a], p.points[b]);
+            add_step(convex_hull, res);
+
+            List<List<Vector3d>> point_cloud = new List<List<Vector3d>>();
+            division(point_cloud, convex_hull, p);
+
+            double maxDistance = 0;
+            for (int i = 0,k=0; i < convex_hull.Count - 2; i = i + 3,++k )
+            {
+                maxDistance = 0;
+                for (b = 0; b < point_cloud[k].Count; ++b)
+                {
+                    maxDistance = Point_plain_distance(point_cloud[k][b], convex_hull[i], convex_hull[i + 1], convex_hull[i + 2]);
+                    max = b;
+                }
+                Vector3d temp = point_cloud[k][max];
+                List<int> to_del = new List<int>();
+                List<Vector3d> edge = new List<Vector3d>();
+                for (int j = 0, jk = 0; j < convex_hull.Count-2; j=j+3,++jk)
+                {
+                    bool found = false;
+                    int counter = 0;
+                    while (!found && counter < point_cloud[jk].Count)
+                    {
+                        if (point_cloud[jk][counter] == temp)
+                        {
+                            found = true;
+                            to_del.Add(jk);
+                        }
+                        else counter++;
+                    }
+                    if (found)
+                    {
+                        edge.Add(convex_hull[j]); edge.Add(convex_hull[j + 1]);
+                        edge.Add(convex_hull[j + 1]); edge.Add(convex_hull[j + 2]);
+                        edge.Add(convex_hull[j + 2]); edge.Add(convex_hull[j]);
+                    }
+                }
+
+            }
+
+            return null;
+        }
+        public void division(List<List<Vector3d>> point_cloud_list, List<Vector3d> fringe_list, Points cloud)
+        {
+            for (int i = 0; i < cloud.num_of_points; ++i)
+            {
+                for (int j = 0, k=0; j < fringe_list.Count-2; j=j+3,++k)
+                {
+                    if (is_point_on_plain(cloud.points[i],fringe_list,fringe_list[j],fringe_list[j+1],fringe_list[j+2]))
+                    {
+                        point_cloud_list[k].Add(p.points[i]);
+                    }
+                }
+            }
+        }
+        public List<List<Vector3d>> Create_convex_hull()
+        {
+            List<Vector3d> convex_hull = new List<Vector3d>();    //Each 3 points form plain
+
+            List<List<Vector3d>> res = new List<List<Vector3d>>();
+
+            generate_EP();
+
+            find_max_distance_between_EPs();
+
+            find_most_distant_point_from_line_in_EP();
+
+            find_most_distant_point_from_plain_in_EP();
+
+            Console.WriteLine("I'm adding 4 triangles into convex_hull");
+            add_plain_to(convex_hull, p.points[a], p.points[b], p.points[c]);
+            add_plain_to(convex_hull, p.points[b], p.points[c], p.points[d]);
+            add_plain_to(convex_hull, p.points[c], p.points[d], p.points[a]);
+            add_plain_to(convex_hull, p.points[d], p.points[a], p.points[b]);
+            //res.Add(convex_hull);
+            add_step(convex_hull, res);
 
             bool[] outside_hull = new bool[p.num_of_points];        //status of points: false - inside (or on) hull, true - outside
             for (int i = 0; i < p.num_of_points; ++i)
@@ -72,8 +150,18 @@ namespace MinEllipsoid_with_visualisation
                         outside_hull[max] = false;
                     }
                 }
+                //res.Add(convex_hull);
+                add_step(convex_hull, res);
             }
-            return convex_hull;
+            //return convex_hull;
+            return res;
+        }
+        public void add_step(List<Vector3d> t, List<List<Vector3d>> res)
+        {
+            Vector3d[] step = new Vector3d[t.Count];
+            t.CopyTo(step, 0);
+            List<Vector3d> steplist = new List<Vector3d>(step);
+            res.Add(steplist);
         }
         public void generate_EP()
         {
@@ -212,6 +300,10 @@ namespace MinEllipsoid_with_visualisation
                     return true;
             }
                 return false;
+        }
+        public bool is_point_on_plain(Vector3d Point, List<Vector3d> convex_hull, Vector3d M0, Vector3d M1, Vector3d M2)
+        {
+            return point_on_plain(Point, convex_hull, M0, M1, M2);
         }
         public bool point_on_plain(Vector3d Point, List<Vector3d> convex_hull, Vector3d M0, Vector3d M1, Vector3d M2)
         {
