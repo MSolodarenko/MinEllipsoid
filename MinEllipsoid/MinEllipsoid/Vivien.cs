@@ -16,28 +16,30 @@ namespace MinEllipsoid
         public double[,] SM;
         public Ellipsoid Vivien_Ellipsoid(List<Vector3d> planes_hull, List<Vector3d> points_hull, bool enable_log)
         {
+            var now = DateTime.Now;
+
             convex_hull = transfigure_list_of_3points_to_faces(planes_hull);
-            if (enable_log) Console.WriteLine("transfigure_list_of_3points_to_faces");
+            if (enable_log)  Console.WriteLine("transfigure_list_of_3points_to_faces  - "+(DateTime.Now-now));
             edges = transfigure_list_of_3points_to_edges(planes_hull);
-            if (enable_log) Console.WriteLine("transfigure_list_of_3points_to_edges");
+            if (enable_log) Console.WriteLine("transfigure_list_of_3points_to_edges  - "+(DateTime.Now-now));
             points = points_hull;
             candidates = new List<Paral_planes>();
             Cuboid parker = build_min_parallelepiped();
-            if (enable_log) Console.WriteLine("build_min_parallelepiped");
+            if (enable_log) Console.WriteLine("build_min_parallelepiped  - " + (DateTime.Now - now));
             points = Program.Translate(points, parker.A);
             parker = Program.Translate(parker, parker.A);
 
             double vol = parker.volume();
-            if (enable_log) Console.WriteLine("counting volume of cuboid");
+            if (enable_log) Console.WriteLine("counting volume of cuboid  - " + (DateTime.Now - now));
             
             parker = transfigure_paral_to_cube_1x1x1(parker);
-            if (enable_log) Console.WriteLine("transfigure_paral_to_cube_1x1x1");
+            if (enable_log) Console.WriteLine("transfigure_paral_to_cube_1x1x1  - " + (DateTime.Now - now));
             double radius = find_radius_of_sphere();
-            if (enable_log) Console.WriteLine("find_radius_of_sphere");
+            if (enable_log) Console.WriteLine("find_radius_of_sphere  - " + (DateTime.Now - now));
             parker = transfigure_cube_to_paral(parker);
-            if (enable_log) Console.WriteLine("transfigure_cube_to_paral");
+            if (enable_log) Console.WriteLine("transfigure_cube_to_paral  - " + (DateTime.Now - now));
             Ellipsoid result = build_ellipsoid_with_(radius);
-            if (enable_log) Console.WriteLine("build_ellipsoid_with_(radius)");
+            if (enable_log) Console.WriteLine("build_ellipsoid_with_(radius)  - " + (DateTime.Now - now));
             result.volume_of_paral = vol;
             return result;
         }
@@ -49,7 +51,7 @@ namespace MinEllipsoid
             Cuboid peter = new Cuboid();
 
             double vol_min = 10000000;
-
+            int f1 = 0, f2 = 0, f3 = 0;
             for (int i = 0; i < candidates.Count(); ++i)
                 for (int j = i; j < candidates.Count(); ++j)
                         for (int k = j; k < candidates.Count(); ++k)
@@ -57,15 +59,21 @@ namespace MinEllipsoid
                                     double t = triple_product_abs(candidates[i].N, candidates[j].N, candidates[k].N);
                                     if (t > 0.000001)
                                     {
-                                        Cuboid parker = new Cuboid(candidates[i], candidates[j], candidates[k]);
-                                        double vol = parker.volume();
+                                        double vol = Math.Abs(
+                                               (candidates[i].distance * candidates[j].distance * candidates[k].distance) 
+                                                / (candidates[i].N.X * (candidates[j].N.Y * candidates[k].N.Z - candidates[j].N.Z * candidates[k].N.Y) + candidates[i].N.Y * (candidates[j].N.Z * candidates[k].N.X - candidates[j].N.X * candidates[k].N.Z) + candidates[i].N.Z * (candidates[j].N.X * candidates[k].N.Y - candidates[j].N.Y * candidates[k].N.X))
+                                                );
                                         if (vol < vol_min)
                                         {
                                             vol_min = vol;
-                                            peter = parker;
+                                            f1 = i;
+                                            f2 = j;
+                                            f3 = k;
                                         }
                                     }
                                 }
+
+            peter = new Cuboid(candidates[f1], candidates[f2], candidates[f3]);
             return peter;
         }
         //public Ellipsoid build_ellipsoid_with_(double r)
@@ -400,9 +408,9 @@ namespace MinEllipsoid
 
             return result;
         }
-        public double norm_vector(Vector3d a)
+        public double double_norm_vector(Vector3d a)
         {
-            double result = Math.Sqrt(a.X * a.X + a.Y * a.Y + a.Z * a.Z);
+            double result = a.X * a.X + a.Y * a.Y + a.Z * a.Z;
             return result;
         }
         public double determinant(double[,] t)
@@ -411,8 +419,7 @@ namespace MinEllipsoid
         }
         public double triple_product_abs(Vector3d a, Vector3d b, Vector3d c)
         {
-            double result = Math.Abs(a.X * (b.Y * c.Z - b.Z * c.Y) + a.Y * (b.Z * c.X - b.X * c.Z) + a.Z * (b.X * c.Y - b.Y * c.X)); 
-            return result;
+            return Math.Abs(a.X * (b.Y * c.Z - b.Z * c.Y) + a.Y * (b.Z * c.X - b.X * c.Z) + a.Z * (b.X * c.Y - b.Y * c.X)); 
         }
         public void set_candidates_from_edges()
         {
@@ -451,9 +458,7 @@ namespace MinEllipsoid
             for (int i = 0; i < convex_hull.Count(); ++i)
             {
                 Vector3d sirius = find_most_distant_point_from_plain(convex_hull[i]);
-                Vector3d normal = new Vector3d(convex_hull[i].A, convex_hull[i].B, convex_hull[i].C);
-                Face lupin = new Face(normal, sirius);
-                Paral_planes james = new Paral_planes(convex_hull[i], lupin, normal);
+                Paral_planes james = new Paral_planes(convex_hull[i], sirius);
                 if (paral_planes_contains_points(james))
                     if (not_in_candidates(james))
                         candidates.Add(james);

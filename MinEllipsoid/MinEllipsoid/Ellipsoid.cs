@@ -35,6 +35,11 @@ namespace MinEllipsoid
             C1 = new Vector3d();
             D1 = new Vector3d();
         }
+        public Cuboid(Vector3d a, Vector3d b, Vector3d c, Vector3d d, Vector3d a1, Vector3d b1, Vector3d c1, Vector3d d1)
+        {
+            A = a; B = b; C = c; D = d;
+            A1 = a1; B1 = b1; C1 = c1; D1 = d1;
+        }
         public Cuboid(Paral_planes f1, Paral_planes f2, Paral_planes f3)
         {
             Face ABCD = f1.A; Face A1B1C1D1 = f1.B;
@@ -94,12 +99,19 @@ namespace MinEllipsoid
             A = (M1.Y - M0.Y) * (M2.Z - M0.Z) - (M2.Y - M0.Y) * (M1.Z - M0.Z);
             B = (M1.Z - M0.Z) * (M2.X - M0.X) - (M1.X - M0.X) * (M2.Z - M0.Z);
             C = (M1.X - M0.X) * (M2.Y - M0.Y) - (M2.X - M0.X) * (M1.Y - M0.Y);
-            D = M0.X * ((M2.Y - M0.Y) * (M1.Z - M0.Z) - (M1.Y - M0.Y) * (M2.Z - M0.Z)) + M0.Y * ((M1.X - M0.X) * (M2.Z - M0.Z) - (M1.Z - M0.Z) * (M2.X - M0.X)) + M0.Z * ((M2.X - M0.X) * (M1.Y - M0.Y) - (M1.X - M0.X) * (M2.Y - M0.Y));
+            D =   M0.X * ((M2.Y - M0.Y) * (M1.Z - M0.Z) - (M1.Y - M0.Y) * (M2.Z - M0.Z)) 
+                + M0.Y * ((M1.X - M0.X) * (M2.Z - M0.Z) - (M1.Z - M0.Z) * (M2.X - M0.X)) 
+                + M0.Z * ((M2.X - M0.X) * (M1.Y - M0.Y) - (M1.X - M0.X) * (M2.Y - M0.Y));
         }
         public Face(Vector3d normal, Vector3d point)
         {
             A = normal.X; B = normal.Y; C = normal.Z;
             D = -1 * (normal.X * point.X + normal.Y * point.Y + normal.Z * point.Z);
+        }
+        public Face(Face a, Vector3d p)
+        {
+            A = a.A; B = a.B; C = a.C;
+            D = -p.X * A - p.Y * B - p.Z * C;
         }
         //public Face(Edge d1, Edge d2)
         //{
@@ -174,12 +186,36 @@ namespace MinEllipsoid
     {
         public Face A, B;
         public Vector3d N;
+        public double distance;
         public Paral_planes() { }
-        public Paral_planes(Face a, Face b, Vector3d n) { A = a; B = b; N = n; }
+        public Paral_planes(Face a, Vector3d Point)
+        {
+            A = a;
+            B = new Face(A, Point);
+            N = new Vector3d(A.A, A.B, A.C);
+            distance = count_distance();
+            N = count_normal();
+        }
+        public Paral_planes(Face a, Face b)
+        {
+            A = a;
+            B = b;
+            N = new Vector3d(A.A, A.B, A.C);
+            distance = count_distance();
+            N = count_normal();
+        }
+        public Paral_planes(Face a, Face b, Vector3d n)
+        {
+            A = a; B = b; N = n; distance = count_distance();
+            N = count_normal();
+        }
         public Paral_planes(Face a, Face b, double nx, double ny, double nz)
         {
-            Vector3d dobby = new Vector3d(nx, ny, nz);
-            A = a; B = b; N = dobby;
+            A = a; 
+            B = b; 
+            N = new Vector3d(nx, ny, nz);
+            distance = count_distance();
+            N = count_normal();
         }
         public Paral_planes(Edge a, Edge b)
         {
@@ -193,6 +229,8 @@ namespace MinEllipsoid
             N = new Vector3d(i, j, k);
             A = new Face(N, a.A);
             B = new Face(N, b.A);
+            distance = count_distance();
+            N = count_normal();
         }
         public bool equals(Paral_planes jack)
         {
@@ -203,6 +241,24 @@ namespace MinEllipsoid
                 if (this.B.equals(jack.A))
                     return true;
             return false;
+        }
+        public double count_distance()
+        {
+            double plain_mod = Math.Sqrt(A.A * A.A + A.B * A.B + A.C * A.C);
+            double plain_point_mod = Math.Abs(A.D - B.D);
+
+            if (plain_mod != 0)
+                return plain_point_mod / plain_mod;
+            return 0;
+        }
+        public Vector3d count_normal()
+        {
+            Vector3d normal = new Vector3d();
+            double sum = Math.Sqrt(A.A * A.A + A.B * A.B + A.C * A.C);
+            normal.X = A.A / sum;
+            normal.Y = A.B / sum;
+            normal.Z = A.C / sum;
+            return normal;
         }
     }
     class Edge

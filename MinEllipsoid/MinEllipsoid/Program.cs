@@ -13,16 +13,16 @@ namespace MinEllipsoid
     {
         static int Main()
         {
-            int N = 10;
-            int number_of_points = 50;
+            int N = 6;
+            int number_of_points = 100;
 
             bool enable_log = false;
 
             StreamWriter sw = new StreamWriter(@"output.txt");
 
-            Ellipsoid[] PR = new Ellipsoid[N+1];
-            Ellipsoid[] Vi = new Ellipsoid[N+1];
-            sw.WriteLine("    VolumePR VolumeVi Paral_PR Paral_Vi ");
+            Ellipsoid[] PR = new Ellipsoid[N + 1];
+            Ellipsoid[] Vi = new Ellipsoid[N + 1];
+            //sw.WriteLine("    VolumePR VolumeVi Paral_PR Paral_Vi ");
             for (int i = 1; i <= N; ++i)
             {
                 Points p = generate_points(i, number_of_points);
@@ -32,13 +32,19 @@ namespace MinEllipsoid
                 Console.WriteLine("*");
                 List<Vector3d> points_hull = create_convex_hulls_point_list(planes_hull);
 
+                var now = DateTime.Now;
+
                 PetRub ell1 = new PetRub();
                 PR[i] = ell1.PetRub_Ellipsoid(points_hull);
                 Console.Write("*");
-                points_hull = create_convex_hulls_point_list(planes_hull);
+                var interval1 = DateTime.Now - now;
 
+                now = DateTime.Now;
+                points_hull = create_convex_hulls_point_list(planes_hull);
+                Console.WriteLine("*");
                 Vivien ell2 = new Vivien();
                 Vi[i] = ell2.Vivien_Ellipsoid(planes_hull, points_hull, enable_log);
+                var interval2 = DateTime.Now - now;
 
                 Console.WriteLine("");
                 Console.WriteLine(i.ToString() + ")   VolumePR = " + PR[i].Volume());
@@ -47,6 +53,8 @@ namespace MinEllipsoid
                 Console.WriteLine("Volume of paral PR = " + PR[i].volume_of_paral);
                 Console.WriteLine("Volume of paral Vi= " + Vi[i].volume_of_paral);
                 Console.WriteLine("");
+                Console.WriteLine("PR Execution time: " + interval1);
+                Console.WriteLine("Vi Execution time: " + interval2);
 
                 sw.WriteLine(i.ToString() + ")   VolumePR = " + PR[i].Volume());
                 sw.WriteLine(i.ToString() + ")   VolumeVi = " + Vi[i].Volume());
