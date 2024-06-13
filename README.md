@@ -1,2 +1,2 @@
 # MinEllipsoid
-Программа для визуализации методов построения минимальных еллипсоидов, которые содержат заданые точки в пространстве
+A program for visualizing methods for constructing minimal ellipsoids that contain given points in space
